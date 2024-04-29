@@ -1,0 +1,76 @@
+﻿Aim:- 
+WAP in C to demonstrate the concept of page replacement policies for handling page faults c.g. FIFO, LRU and Optimal
+
+a)FIFO
+
+b)LRU
+
+c)Optimal
+
+Code:-
+
+int fifoPageReplacement(int pages[], int n, int capacity) {
+    int frames[capacity], page_faults = 0, first_in = 0;
+    for (int i = 0; i < capacity; i++)
+        frames[i] = -1;
+
+    for (int i = 0; i < n; i++) {
+        if (!isPagePresent(pages[i], frames, capacity)) {
+            frames[first_in] = pages[i];
+            first_in = (first_in + 1) % capacity;
+            page_faults++;
+        }
+    }
+    return page_faults;
+}
+
+// LRU Page Replacement Algorithm
+int lruPageReplacement(int pages[], int n, int capacity) {
+    int frames[capacity], page_faults = 0;
+    for (int i = 0; i < capacity; i++)
+        frames[i] = -1;
+
+    int counter = 0, least_index[capacity];
+    for (int i = 0; i < n; i++) {
+        if (!isPagePresent(pages[i], frames, capacity)) {
+            int j = 0;
+            if (counter < capacity) {
+                frames[counter] = pages[i];
+                least_index[counter] = counter;
+                counter++;
+            } else {
+                int least_used = least_index[0];
+                for (j = 1; j < capacity; j++) {
+                    if (least_index[j] < least_used)
+                        least_used = least_index[j];
+                }
+                frames[least_used] = pages[i];
+                least_index[least_used] = counter;
+                counter++;
+            }
+            page_faults++;
+        }
+    }
+    return page_faults;
+}
+
+int main() {
+    int reference_string[] = {4, 7, 6, 1, 7, 6, 1, 2, 7, 2};
+    int n = sizeof(reference_string) / sizeof(reference_string[0]);
+    int capacity = 3;
+
+    printf("Optimal Page Replacement Algorithm: %d page faults\n", optimalPageReplacement(reference_string, n, capacity));
+    printf("FIFO Page Replacement Algorithm: %d page faults\n", fifoPageReplacement(reference_string, n, capacity));
+    printf("LRU Page Replacement Algorithm: %d page faults\n", lruPageReplacement(reference_string, n, capacity));
+
+    return 0;
+} 
+
+
+Output:- 
+
+
+
+Conclusion:-
+                      This program defines functions to simulate the Optimal, FIFO, and LRU page replacement algorithms and then calls these functions with the given reference string and number of frames. Finally, it prints the number of page faults for each algorithm.
+

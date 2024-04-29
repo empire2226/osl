@@ -1,0 +1,57 @@
+﻿Aim:-
+Linux Shell Script. a. Display OS version, release number, kernel version. b. Display top 10 processes in descending order. c. Display processes with highest memory usage. d. Display current logged-in user and log name. Display current shell, home directory, operating system type, current path, current working director
+
+Code:-
+#!/bin/bash
+
+# a. Display OS version, release number, kernel version
+echo "Operating System Information:"
+cat /etc/os-release | grep -E "VERSION|NAME|VERSION_ID"
+uname -r
+echo
+
+# b. Display top 10 processes in descending order
+echo "Top 10 Processes:"
+ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -n 11
+echo
+
+# c. Display processes with highest memory usage
+echo "Processes with Highest Memory Usage:"
+ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -n 6
+echo
+
+# d. Display current logged-in user and log name
+echo "Current Logged-in User and Log Name:"
+who
+echo
+
+# Display current shell, home directory, operating system type, current path, current working directory
+echo "System Information:"
+echo "Current Shell: $SHELL"
+echo "Home Directory: $HOME"
+echo "Operating System Type: $(uname -o)"
+echo "Current Path: $PATH"
+echo "Current Working Directory: $(pwd)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Output:-
+
+
+
+Conclusion:-
+                        In conclusion, the provided shell script offers a comprehensive overview of the system's status and configuration. It covers various aspects such as OS information, process monitoring, user details, and system environment details.
+
+

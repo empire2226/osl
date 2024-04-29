@@ -1,0 +1,304 @@
+﻿Aim:- 
+WAP in C for disk scheduling: 
+
+a. FCFS 
+Code:- 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+// Function to implement FCFS disk scheduling algorithm
+void fcfs(int disk_queue[], int num_requests, int initial_position) {
+    int total_distance = 0;
+
+    // Calculate total distance
+    for (int i = 0; i < num_requests; i++) {
+        total_distance += abs(disk_queue[i] - initial_position);
+        initial_position = disk_queue[i];
+    }
+
+    printf("Total head movement (FCFS): %d\n", total_distance);
+}
+
+int main() {
+    int disk_queue[] = {98, 183, 37, 122, 14, 124, 65, 67};
+    int num_requests = sizeof(disk_queue) / sizeof(disk_queue[0]);
+    int initial_position = 53; // Initial head position
+
+    fcfs(disk_queue, num_requests, initial_position);
+
+    return 0;
+}
+
+
+Output:- 
+
+
+
+
+
+b. SCAN 
+Code:- 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Function to implement SCAN disk scheduling algorithm
+void scan(int disk_queue[], int num_requests, int initial_position, int max_cylinder) {
+    int total_distance = 0;
+    bool direction_up = true;
+
+    // Sort disk queue
+    for (int i = 0; i < num_requests - 1; i++) {
+        for (int j = 0; j < num_requests - i - 1; j++) {
+            if (disk_queue[j] > disk_queue[j + 1]) {
+                int temp = disk_queue[j];
+                disk_queue[j] = disk_queue[j + 1];
+                disk_queue[j + 1] = temp;
+            }
+        }
+    }
+
+    // Find index of initial position in sorted queue
+    int initial_index;
+    for (int i = 0; i < num_requests; i++) {
+        if (disk_queue[i] >= initial_position) {
+            initial_index = i;
+            break;
+        }
+    }
+
+    // Scan towards larger cylinder numbers
+    for (int i = initial_index; i < num_requests; i++) {
+        total_distance += abs(disk_queue[i] - initial_position);
+        initial_position = disk_queue[i];
+    }
+
+    // Scan towards smaller cylinder numbers
+    total_distance += max_cylinder - initial_position;
+    initial_position = max_cylinder;
+
+    for (int i = initial_index - 1; i >= 0; i--) {
+        total_distance += abs(disk_queue[i] - initial_position);
+        initial_position = disk_queue[i];
+    }
+
+    printf("Total head movement (SCAN): %d\n", total_distance);
+}
+
+int main() {
+    int disk_queue[] = {98, 183, 37, 122, 14, 124, 65, 67};
+    int num_requests = sizeof(disk_queue) / sizeof(disk_queue[0]);
+    int initial_position = 53; // Initial head position
+    int max_cylinder = 199; // Maximum cylinder number
+
+    scan(disk_queue, num_requests, initial_position, max_cylinder);
+
+    return 0;
+}
+
+
+Output:- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+c. CSCAN
+
+Code:- 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Function to implement CSCAN disk scheduling algorithm
+void cscan(int disk_queue[], int num_requests, int initial_position, int max_cylinder) {
+    int total_distance = 0;
+
+    // Sort disk queue
+    for (int i = 0; i < num_requests - 1; i++) {
+        for (int j = 0; j < num_requests - i - 1; j++) {
+            if (disk_queue[j] > disk_queue[j + 1]) {
+                int temp = disk_queue[j];
+                disk_queue[j] = disk_queue[j + 1];
+                disk_queue[j + 1] = temp;
+            }
+        }
+    }
+
+    // Find index of initial position in sorted queue
+    int initial_index;
+    for (int i = 0; i < num_requests; i++) {
+        if (disk_queue[i] >= initial_position) {
+            initial_index = i;
+            break;
+        }
+    }
+
+    // Scan towards larger cylinder numbers
+    for (int i = initial_index; i < num_requests; i++) {
+        total_distance += abs(disk_queue[i] - initial_position);
+        initial_position = disk_queue[i];
+    }
+
+    // Return to beginning of disk
+    total_distance += max_cylinder - initial_position;
+    initial_position = 0;
+
+    // Continue scanning towards larger cylinder numbers
+    for (int i = 0; i < initial_index; i++) {
+        total_distance += abs(disk_queue[i] - initial_position);
+        initial_position = disk_queue[i];
+    }
+
+    printf("Total head movement (CSCAN): %d\n", total_distance);
+}
+
+int main() {
+    int disk_queue[] = {98, 183, 37, 122, 14, 124, 65, 67};
+    int num_requests = sizeof(disk_queue) / sizeof(disk_queue[0]);
+    int initial_position = 53; // Initial head position
+    int max_cylinder = 199; // Maximum cylinder number
+
+    cscan(disk_queue, num_requests, initial_position, max_cylinder);
+
+    return 0;
+}
+
+Output:- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d. SSTF
+
+Code:- 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+// Function to calculate the absolute difference between two numbers
+int abs_diff(int a, int b) {
+    return abs(a - b);
+}
+
+// Function to find the index of the shortest seek time request
+int find_shortest_seek_time(int *requests, int num_requests, int head_position) {
+    int shortest_seek_time = INT_MAX;
+    int shortest_index = -1;
+
+    for (int i = 0; i < num_requests; i++) {
+        if (!requests[i]) {
+            continue; // Skip processed requests
+        }
+
+        int seek_time = abs_diff(requests[i], head_position);
+        if (seek_time < shortest_seek_time) {
+            shortest_seek_time = seek_time;
+            shortest_index = i;
+        }
+    }
+
+    return shortest_index;
+}
+
+// Function to calculate the total seek time
+int calculate_seek_time(int *requests, int num_requests, int start_position) {
+    int total_seek_time = 0;
+    int head_position = start_position;
+
+    for (int i = 0; i < num_requests; i++) {
+        int shortest_index = find_shortest_seek_time(requests, num_requests, head_position);
+        if (shortest_index == -1) {
+            break; // All requests processed
+        }
+
+        total_seek_time += abs_diff(requests[shortest_index], head_position);
+        head_position = requests[shortest_index];
+        requests[shortest_index] = 0; // Mark request as processed
+    }
+
+    return total_seek_time;
+}
+
+int main() {
+    int num_requests, start_position;
+
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &num_requests);
+
+    printf("Enter the starting head position: ");
+    scanf("%d", &start_position);
+
+    int *requests = (int *)malloc(num_requests * sizeof(int));
+    if (requests == NULL) {
+        printf("Memory allocation failed\n");
+        return 1;
+    }
+
+    printf("Enter the disk request positions:\n");
+    for (int i = 0; i < num_requests; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    int total_seek_time = calculate_seek_time(requests, num_requests, start_position);
+
+    printf("Total seek time using SSTF: %d\n", total_seek_time);
+
+    free(requests);
+    return 0;
+}
+
+Output:- 
+
+
+Conclusion:-
+                     In conclusion, each disk scheduling algorithm has its advantages and disadvantages, and the choice of algorithm depends on factors such as the workload pattern, disk characteristics, and system requirements. By understanding and implementing these algorithms, system designers can optimize disk access and improve overall system performance.
+

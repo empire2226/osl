@@ -1,0 +1,260 @@
+﻿Aim:-
+
+Memory Management: WAP to demonstrate the concept of dynamic partitioning replacement algorithms: 
+
+a. First Fit
+
+Code:-
+#include <stdio.h>
+
+#define MEMORY_SIZE 100
+#define MAX_PARTITIONS 10
+
+typedef struct {
+    int start_address;
+    int end_address;
+    int size;
+    int allocated;
+} Partition;
+
+Partition memory[MAX_PARTITIONS];
+int num_partitions = 0;
+
+// Function to initialize memory
+void initializeMemory() {
+    memory[0].start_address = 0;
+    memory[0].end_address = MEMORY_SIZE - 1;
+    memory[0].size = MEMORY_SIZE;
+    memory[0].allocated = 0;
+    num_partitions = 1;
+}
+
+// Function to display memory
+void displayMemory() {
+    printf("Memory Layout:\n");
+    printf("Start Address\tEnd Address\tSize\tAllocated\n");
+    for (int i = 0; i < num_partitions; i++) {
+        printf("%d\t\t%d\t\t%d\t%s\n", memory[i].start_address, memory[i].end_address,
+               memory[i].size, memory[i].allocated ? "Yes" : "No");
+    }
+    printf("\n");
+}
+
+// Function to allocate memory using First Fit algorithm
+void firstFit(int size) {
+    for (int i = 0; i < num_partitions; i++) {
+        if (!memory[i].allocated && memory[i].size >= size) {
+            memory[i].allocated = 1;
+            if (memory[i].size > size) {
+                memory[num_partitions].start_address = memory[i].start_address + size;
+                memory[num_partitions].end_address = memory[i].end_address;
+                memory[num_partitions].size = memory[i].size - size;
+                memory[num_partitions].allocated = 0;
+                num_partitions++;
+            }
+            memory[i].size = size;
+            printf("Memory allocated using First Fit.\n");
+            return;
+        }
+    }
+    printf("Memory allocation failed using First Fit.\n");
+}
+
+int main() {
+    int size;
+    initializeMemory();
+
+    printf("Enter memory size to allocate: ");
+    scanf("%d", &size);
+    firstFit(size);
+    displayMemory();
+
+    return 0;
+}
+
+
+Output:-
+
+
+
+
+
+
+
+
+
+
+
+
+
+b. Best Fit:-
+
+Code:-
+#include <stdio.h>
+
+#define MEMORY_SIZE 100
+#define MAX_PARTITIONS 10
+
+typedef struct {
+    int start_address;
+    int end_address;
+    int size;
+    int allocated;
+} Partition;
+
+Partition memory[MAX_PARTITIONS];
+int num_partitions = 0;
+
+// Function to initialize memory
+void initializeMemory() {
+    memory[0].start_address = 0;
+    memory[0].end_address = MEMORY_SIZE - 1;
+    memory[0].size = MEMORY_SIZE;
+    memory[0].allocated = 0;
+    num_partitions = 1;
+}
+
+// Function to display memory
+void displayMemory() {
+    printf("Memory Layout:\n");
+    printf("Start Address\tEnd Address\tSize\tAllocated\n");
+    for (int i = 0; i < num_partitions; i++) {
+        printf("%d\t\t%d\t\t%d\t%s\n", memory[i].start_address, memory[i].end_address,
+               memory[i].size, memory[i].allocated ? "Yes" : "No");
+    }
+    printf("\n");
+}
+
+// Function to allocate memory using Best Fit algorithm
+void bestFit(int size) {
+    int best_fit_index = -1;
+    int min_fragmentation = MEMORY_SIZE + 1;
+
+    for (int i = 0; i < num_partitions; i++) {
+        if (!memory[i].allocated && memory[i].size >= size) {
+            int fragmentation = memory[i].size - size;
+            if (fragmentation < min_fragmentation) {
+                min_fragmentation = fragmentation;
+                best_fit_index = i;
+            }
+        }
+    }
+
+    if (best_fit_index != -1) {
+        memory[best_fit_index].allocated = 1;
+        if (memory[best_fit_index].size > size) {
+            memory[num_partitions].start_address = memory[best_fit_index].start_address + size;
+            memory[num_partitions].end_address = memory[best_fit_index].end_address;
+            memory[num_partitions].size = memory[best_fit_index].size - size;
+            memory[num_partitions].allocated = 0;
+            num_partitions++;
+        }
+        memory[best_fit_index].size = size;
+        printf("Memory allocated using Best Fit.\n");
+    } else {
+        printf("Memory allocation failed using Best Fit.\n");
+    }
+}
+
+int main() {
+    int size;
+    initializeMemory();
+
+    printf("Enter memory size to allocate: ");
+    scanf("%d", &size);
+    bestFit(size);
+    displayMemory();
+
+    return 0;
+}
+
+Output:-
+
+
+
+
+Worst Fit:-
+Code:-
+#include <stdio.h>
+
+#define MEMORY_SIZE 100
+#define MAX_PARTITIONS 10
+
+typedef struct {
+    int start_address;
+    int end_address;
+    int size;
+    int allocated;
+} Partition;
+
+Partition memory[MAX_PARTITIONS];
+int num_partitions = 0;
+
+// Function to initialize memory
+void initializeMemory() {
+    memory[0].start_address = 0;
+    memory[0].end_address = MEMORY_SIZE - 1;
+    memory[0].size = MEMORY_SIZE;
+    memory[0].allocated = 0;
+    num_partitions = 1;
+}
+
+// Function to display memory
+void displayMemory() {
+    printf("Memory Layout:\n");
+    printf("Start Address\tEnd Address\tSize\tAllocated\n");
+    for (int i = 0; i < num_partitions; i++) {
+        printf("%d\t\t%d\t\t%d\t%s\n", memory[i].start_address, memory[i].end_address,
+               memory[i].size, memory[i].allocated ? "Yes" : "No");
+    }
+    printf("\n");
+}
+
+// Function to allocate memory using Worst Fit algorithm
+void worstFit(int size) {
+    int worst_fit_index = -1;
+    int max_fragmentation = -1;
+
+    for (int i = 0; i < num_partitions; i++) {
+        if (!memory[i].allocated && memory[i].size >= size) {
+            int fragmentation = memory[i].size - size;
+            if (fragmentation > max_fragmentation) {
+                max_fragmentation = fragmentation;
+                worst_fit_index = i;
+            }
+        }
+    }
+
+    if (worst_fit_index != -1) {
+        memory[worst_fit_index].allocated = 1;
+        if (memory[worst_fit_index].size > size) {
+            memory[num_partitions].start_address = memory[worst_fit_index].start_address + size;
+            memory[num_partitions].end_address = memory[worst_fit_index].end_address;
+            memory[num_partitions].size = memory[worst_fit_index].size - size;
+            memory[num_partitions].allocated = 0;
+            num_partitions++;
+        }
+        memory[worst_fit_index].size = size;
+        printf("Memory allocated using Worst Fit.\n");
+    } else {
+        printf("Memory allocation failed using Worst Fit.\n");
+    }
+}
+
+int main() {
+    int size;
+    initializeMemory();
+
+    printf("Enter memory size to allocate: ");
+    scanf("%d", &size);
+    worstFit(size);
+    displayMemory();
+
+    return 0;
+}
+Output:-
+
+
+
+Conclusion:-In conclusion, each allocation strategy has its trade-offs in terms of fragmentation and computational efficiency. The choice of strategy depends on the specific requirements of the system, such as the expected size distribution of processes and the tolerance for fragmentation.
+

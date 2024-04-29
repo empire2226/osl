@@ -1,0 +1,187 @@
+﻿Aim:-Process management scheduling.
+
+a. WAP to demonstrate the concept of non-premptive scheduling algorithms.
+
+Code:-
+#include <stdio.h>
+#include <stdbool.h>
+
+// Structure to represent a process
+typedef struct {
+    int process_id;
+    int arrival_time;
+    int burst_time;
+    int waiting_time;
+    int turnaround_time;
+    bool completed;
+} Process;
+
+// Function to calculate waiting time and turnaround time for each process
+void calculateTimes(Process processes[], int num_processes) {
+    int current_time = 0;
+    int total_waiting_time = 0;
+    int total_turnaround_time = 0;
+
+    // Sort processes based on arrival time
+    for (int i = 0; i < num_processes - 1; i++) {
+        for (int j = 0; j < num_processes - i - 1; j++) {
+            if (processes[j].arrival_time > processes[j + 1].arrival_time) {
+                Process temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+
+    // Calculate waiting time and turnaround time
+    for (int i = 0; i < num_processes; i++) {
+        if (!processes[i].completed) {
+            processes[i].waiting_time = current_time - processes[i].arrival_time;
+            processes[i].turnaround_time = processes[i].waiting_time + processes[i].burst_time;
+            current_time += processes[i].burst_time;
+            processes[i].completed = true;
+            total_waiting_time += processes[i].waiting_time;
+            total_turnaround_time += processes[i].turnaround_time;
+        }
+    }
+
+    // Calculate average waiting time and average turnaround time
+    float avg_waiting_time = (float)total_waiting_time / num_processes;
+    float avg_turnaround_time = (float)total_turnaround_time / num_processes;
+
+    // Display process details
+    printf("Process\t Arrival Time\t Burst Time\t Waiting Time\t Turnaround Time\n");
+    for (int i = 0; i < num_processes; i++) {
+        printf("%d\t\t %d\t\t\t %d\t\t\t %d\t\t\t %d\n", processes[i].process_id, processes[i].arrival_time,
+               processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+    printf("\nAverage Waiting Time: %.2f\n", avg_waiting_time);
+    printf("Average Turnaround Time: %.2f\n", avg_turnaround_time);
+}
+
+int main() {
+    Process processes[] = {{1, 0, 5, 0, 0}, {2, 1, 3, 0, 0}, {3, 2, 8, 0, 0}, {4, 3, 6, 0, 0}};
+    int num_processes = sizeof(processes) / sizeof(processes[0]);
+
+    calculateTimes(processes, num_processes);
+
+    return 0;
+}
+
+Output:-
+
+
+
+
+
+
+
+
+
+b. WAP to demonstrate the concept of pre-emptive scheduling algorithms.
+
+Code:-
+#include <stdio.h>
+#include <stdbool.h>
+
+// Structure to represent a process
+typedef struct {
+    int process_id;
+    int arrival_time;
+    int burst_time;
+    int remaining_time;
+    int waiting_time;
+    int turnaround_time;
+    bool completed;
+} Process;
+
+// Function to find process with shortest remaining time
+int findShortestProcess(Process processes[], int num_processes, int current_time) {
+    int shortest_index = -1;
+    int shortest_time = __INT_MAX__;
+
+    for (int i = 0; i < num_processes; i++) {
+        if (!processes[i].completed && processes[i].arrival_time <= current_time &&
+            processes[i].remaining_time < shortest_time) {
+            shortest_index = i;
+            shortest_time = processes[i].remaining_time;
+        }
+    }
+
+    return shortest_index;
+}
+
+// Function to calculate waiting time and turnaround time for each process
+void calculateTimes(Process processes[], int num_processes) {
+    int current_time = 0;
+    int total_waiting_time = 0;
+    int total_turnaround_time = 0;
+
+    // Calculate remaining time for each process
+    for (int i = 0; i < num_processes; i++) {
+        processes[i].remaining_time = processes[i].burst_time;
+    }
+
+    // Continue until all processes are completed
+    while (true) {
+        int shortest_index = findShortestProcess(processes, num_processes, current_time);
+        if (shortest_index == -1) {
+            break; // All processes completed
+        }
+
+        // Execute process for one time unit
+        processes[shortest_index].remaining_time--;
+        current_time++;
+
+        // Update waiting time and turnaround time
+        for (int i = 0; i < num_processes; i++) {
+            if (i != shortest_index && !processes[i].completed && processes[i].arrival_time <= current_time) {
+                processes[i].waiting_time++;
+            }
+        }
+
+        // Check if process completed
+        if (processes[shortest_index].remaining_time == 0) {
+            processes[shortest_index].turnaround_time = current_time - processes[shortest_index].arrival_time;
+            total_waiting_time += processes[shortest_index].waiting_time;
+            total_turnaround_time += processes[shortest_index].turnaround_time;
+            processes[shortest_index].completed = true;
+        }
+    }
+
+    // Calculate average waiting time and average turnaround time
+    float avg_waiting_time = (float)total_waiting_time / num_processes;
+    float avg_turnaround_time = (float)total_turnaround_time / num_processes;
+
+    // Display process details
+    printf("Process\t Arrival Time\t Burst Time\t Waiting Time\t Turnaround Time\n");
+    for (int i = 0; i < num_processes; i++) {
+        printf("%d\t\t %d\t\t\t %d\t\t\t %d\t\t\t %d\n", processes[i].process_id, processes[i].arrival_time,
+               processes[i].burst_time, processes[i].waiting_time, processes[i].turnaround_time);
+    }
+    printf("\nAverage Waiting Time: %.2f\n", avg_waiting_time);
+    printf("Average Turnaround Time: %.2f\n", avg_turnaround_time);
+}
+
+int main() {
+    Process processes[] = {{1, 0, 5, 0, 0, 0, false}, {2, 1, 3, 0, 0, 0, false}, {3, 2, 8, 0, 0, 0, false},
+                           {4, 3, 6, 0, 0, 0, false}};
+    int num_processes = sizeof(processes) / sizeof(processes[0]);
+
+    calculateTimes(processes, num_processes);
+
+    return 0;
+}
+
+
+
+
+
+
+Output:-
+
+
+
+
+Conclusion:-These programs demonstrate non-preemptive scheduling using SJF (Shortest Job First) algorithm and preemptive scheduling using SRTF (Shortest Remaining Time First) algorithm, respectively.
+
